@@ -15,7 +15,7 @@ const CardsPage = () => {
   const fetchTemperature = async () => {
     try {
       const response = await axios.get('http://localhost:5271/api/Temperatura');
-      const data = response.data && response.data.length > 0 ? response.data[0] : null; // Verificação de existência de dados
+      const data = response.data && response.data.length > 0 ? response.data[response.data.length - 1] : null; // Pega o último item
       if (data) {
         setSensorData(prevData => ({
           ...prevData,
@@ -31,7 +31,7 @@ const CardsPage = () => {
   const fetchAirHumidity = async () => {
     try {
       const response = await axios.get('http://localhost:5271/api/Umidade');
-      const data = response.data && response.data.length > 0 ? response.data[0] : null; // Verificação de existência de dados
+      const data = response.data && response.data.length > 0 ? response.data[response.data.length - 1] : null; // Pega o último item
       if (data) {
         setSensorData(prevData => ({
           ...prevData,
@@ -47,7 +47,7 @@ const CardsPage = () => {
   const fetchSoilMoisture = async () => {
     try {
       const response = await axios.get('http://localhost:5271/api/UmidadeTerra');
-      const data = response.data && response.data.length > 0 ? response.data[0] : null; // Verificação de existência de dados
+      const data = response.data && response.data.length > 0 ? response.data[response.data.length - 1] : null; // Pega o último item
       if (data) {
         setSensorData(prevData => ({
           ...prevData,

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Estufa.Data;
 using Estufa.Models;
+using Estufa.Models.dto;
 
 namespace Estufa.Controllers
 {
@@ -59,11 +60,17 @@ namespace Estufa.Controllers
         // POST: api/Temperatura
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Temperatura>> PostTemperatura(Temperatura temperatura)
+        public async Task<ActionResult<Temperatura>> PostTemperatura(CriarTemperatureDTO temperatureDTO)
         {
+            var temperatura = new Temperatura
+            {
+                TemperaturaAtual = temperatureDTO.TemperaturaAtual,
+                TemperaturaIdeal = temperatureDTO.TemperaturaIdeal,
+                UltimaMedicao = DateTime.Now  // Definindo a data da última medição como a data atual
+            };
             _context.Temperatura.Add(temperatura);
             await _context.SaveChangesAsync();
-
+           
             return CreatedAtAction("GetTemperatura", new { id = temperatura.Id }, temperatura);
         }
 

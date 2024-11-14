@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -10,7 +11,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-
+ 
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -20,52 +21,92 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
+ 
 const ChartsPage = () => {
-  // Estado do intervalo de tempo do filtro
   const [timeRange, setTimeRange] = useState('7d');
-
-  // Dados fictícios para o gráfico
+ 
+  // Estado para os dados do gráfico
   const [chartData, setChartData] = useState({
+    labels: [],
     temperature: [],
     humidity: [],
     soilMoisture: [],
-    labels: [],
   });
-
-  /**
-   * Função `fetchChartData` simula a obtenção de dados de gráfico.
-   * FUTURAMENTE: Substituir por uma chamada à API para buscar dados reais.
-   * 
-   * Exemplo de integração com API:
-   * - Substitua `URL_DA_API` pela URL correta.
-   * - Ajuste `type` e `range` para que a API retorne dados filtrados.
-   * 
-   * useEffect(() => {
-   *   const fetchChartData = async () => {
-   *     const response = await fetch(`URL_DA_API/data?type=all&range=${timeRange}`);
-   *     const data = await response.json();
-   *     setChartData(data); // Atualiza o estado com dados reais
-   *   };
-   * 
-   *   fetchChartData();
-   * }, [timeRange]);
-   */
+ 
+  // Função para buscar dados de temperatura
+  const fetchTemperatureData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5271/api/Temperatura`);
+      const data = response.data;
+      return data.map(entry => ({
+        date: entry.ultimaMedicao,
+        value: entry.temperaturaAtual,
+      }));
+    } catch (error) {
+      console.error("Erro ao buscar dados de temperatura:", error);
+      return [];
+    }
+  };
+ 
+  // Função para buscar dados de umidade do ar
+  const fetchHumidityData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5271/api/Umidade`);
+      const data = response.data;
+      return data.map(entry => ({
+        date: entry.ultimaMedicao,
+        value: entry.umidadeAtual,
+      }));
+    } catch (error) {
+      console.error("Erro ao buscar dados de umidade do ar:", error);
+      return [];
+    }
+  };
+ 
+  // Função para buscar dados de umidade do solo
+  const fetchSoilMoistureData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5271/api/UmidadeTerra`);
+      const data = response.data;
+      return data.map(entry => ({
+        date: entry.ultimaMedicao,
+        value: entry.umidadeTerraAtual,
+      }));
+    } catch (error) {
+      console.error("Erro ao buscar dados de umidade do solo:", error);
+      return [];
+    }
+  };
+ 
+  // Função para buscar todos os dados e configurar o estado do gráfico
+  const fetchChartData = async () => {
+    try {
+      const [temperatureData, humidityData, soilMoistureData] = await Promise.all([
+        fetchTemperatureData(),
+        fetchHumidityData(),
+        fetchSoilMoistureData(),
+      ]);
+ 
+      // Assumindo que as datas estão sincronizadas entre os dados
+      const labels = temperatureData.map(entry => entry.date);
+ 
+      setChartData({
+        labels,
+        temperature: temperatureData.map(entry => entry.value),
+        humidity: humidityData.map(entry => entry.value),
+        soilMoisture: soilMoistureData.map(entry => entry.value),
+      });
+    } catch (error) {
+      console.error("Erro ao configurar os dados do gráfico:", error);
+    }
+  };
+ 
+  // Atualiza o gráfico ao montar o componente e quando timeRange é alterado
   useEffect(() => {
-    const fetchChartData = () => {
-      const mockData = {
-        labels: timeRange === '7d' ? ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'] : ['1h', '2h', '3h', '4h', '5h'],
-        temperature: [22, 24, 21, 23, 25, 26, 24],
-        humidity: [75, 70, 72, 73, 78, 76, 74],
-        soilMoisture: [47, 50, 52, 48, 45, 46, 47],
-      };
-      setChartData(mockData);
-    };
-
     fetchChartData();
   }, [timeRange]);
-
-  // Configuração do gráfico com dados fictícios
+ 
+  // Configuração dos dados do gráfico
   const data = {
     labels: chartData.labels,
     datasets: [
@@ -95,7 +136,7 @@ const ChartsPage = () => {
       },
     ],
   };
-
+ 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -104,32 +145,32 @@ const ChartsPage = () => {
       tooltip: { mode: 'index', intersect: false },
     },
     scales: {
-      x: { title: { display: true, text: 'Tempo' } },
+      x: { title: { display: true, text: 'Data' } },
       y: { title: { display: true, text: 'Valores' }, min: 0 },
     },
   };
-
+ 
   return (
-    <div style={{ padding: '1rem', textAlign: 'center', borderRadius: '8px' }}>
-      <h2 style={{ marginBottom: '1rem' }}>Gráficos de Dados</h2>
-
+<div style={{ padding: '1rem', textAlign: 'center', borderRadius: '8px' }}>
+<h2 style={{ marginBottom: '1rem' }}>Gráficos de Dados</h2>
+ 
       {/* Filtro de Intervalo de Tempo */}
-      <div style={{ marginBottom: '0.5rem' }}>
-        <label>Intervalo de Tempo: </label>
-        <select
+<div style={{ marginBottom: '0.5rem' }}>
+<label>Intervalo de Tempo: </label>
+<select
           value={timeRange}
           onChange={(e) => setTimeRange(e.target.value)}
           style={{ padding: '0.5rem', borderRadius: '5px', marginLeft: '0.5rem' }}
-        >
-          <option value="1h">Última Hora</option>
-          <option value="24h">Últimas 24 Horas</option>
-          <option value="7d">Últimos 7 Dias</option>
-          <option value="30d">Últimos 30 Dias</option>
-        </select>
-      </div>
-
+>
+<option value="1h">Última Hora</option>
+<option value="24h">Últimas 24 Horas</option>
+<option value="7d">Últimos 7 Dias</option>
+<option value="30d">Últimos 30 Dias</option>
+</select>
+</div>
+ 
       {/* Contêiner do Gráfico */}
-      <div style={{
+<div style={{
         position: 'relative',
         width: '100%',
         maxWidth: '800px',
@@ -140,10 +181,10 @@ const ChartsPage = () => {
         borderRadius: '8px',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
       }}>
-        <Line data={data} options={options} />
-      </div>
-    </div>
+<Line data={data} options={options} />
+</div>
+</div>
   );
 };
-
+ 
 export default ChartsPage;

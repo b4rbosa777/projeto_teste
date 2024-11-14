@@ -565,3 +565,4 @@ C:\Teste\Backend\obj\Debug\net8.0\refint\Estufa.dll
 C:\Teste\Backend\obj\Debug\net8.0\Estufa.pdb
 C:\Teste\Backend\obj\Debug\net8.0\Estufa.genruntimeconfig.cache
 C:\Teste\Backend\obj\Debug\net8.0\ref\Estufa.dll
+C:\Teste\Backend\obj\Debug\net8.0\Estufa.sourcelink.json
