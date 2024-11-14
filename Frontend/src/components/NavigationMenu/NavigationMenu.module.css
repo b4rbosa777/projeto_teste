@@ -49,6 +49,33 @@
     background-color: #555;
     border-radius: 8px;
   }
+
+  .logoutButton{
+    background-color: transparent;
+    border: 2px solid #fff;
+    padding: 10px;
+    border-radius: 10px;
+    width: 100%;
+    margin-top: 70px;
+  }
+ 
+  .logoutButton:hover{
+    background-color: transparent;
+    border: 2px solid #f37373;
+    background-color: #555;
+    padding: 10px;
+    border-radius: 10px;
+    width: 100%;
+    margin-top: 70px;
+  }
+ 
+ 
+  .iconCenter{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   
   /* Responsividade */
   @media (max-width: 768px) {

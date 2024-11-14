@@ -1,47 +1,57 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import UserInfoCard from '../components/UserInfoCard/UserInfoCard';
-
+ 
 const UserPage = () => {
-  // Estado com dados fictícios (a ser substituído pela API)
   const [userData, setUserData] = useState({
+    id: 1, // ID do usuário para atualização; ajuste conforme necessário
     name: 'João da Silva',
     password: '********', // Senha fictícia oculta
   });
-  const [editMode, setEditMode] = useState(false); // Controla o modo de edição
+  const [editMode, setEditMode] = useState(false);
   const [newName, setNewName] = useState(userData.name);
-  const [newPassword, setNewPassword] = useState(''); // Campo para a nova senha
-
-  // Simulação de busca de dados de usuário (substituir pela API)
+  const [newPassword, setNewPassword] = useState('');
+ 
+  // Função para buscar os dados do usuário
   useEffect(() => {
     const fetchUserData = async () => {
-      // Exemplo de requisição futura da API (substitua 'URL_DA_API' pela sua URL)
-      // const response = await fetch('URL_DA_API/user');
-      // const data = await response.json();
-      // setUserData(data); // Atualiza o estado com os dados reais da API
-
-      console.log('Dados fictícios carregados');
+      try {
+        const response = await axios.get(`http://localhost:5271/api/Login/${userData.id}`);
+        setUserData({
+          id: response.data.id,
+          name: response.data.nome,
+          password: '********', // Oculta a senha real
+        });
+        setNewName(response.data.nome);
+      } catch (error) {
+        console.error('Erro ao buscar dados do usuário:', error);
+      }
     };
-
+ 
     fetchUserData();
-  }, []);
-
-  // Função para salvar as alterações (substituir pela API)
+  }, [userData.id]);
+ 
+  // Função para salvar as alterações
   const handleSave = async () => {
-    // Exemplo de requisição PUT ou PATCH para atualizar os dados (substitua 'URL_DA_API' pela sua URL)
-    // await fetch('URL_DA_API/user', {
-    //   method: 'PUT',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ name: newName, password: newPassword })
-    // });
-
-    setUserData({ ...userData, name: newName });
-    setEditMode(false);
-    console.log('Alterações salvas'); // Remover após integração com a API
+    try {
+      await axios.put(`http://localhost:5271/api/Login/${userData.id}`, {
+        id: userData.id,
+        nome: newName,
+        senha: newPassword,
+      });
+ 
+      setUserData({ ...userData, name: newName });
+      setEditMode(false);
+      alert('Alterações salvas com sucesso');
+    } catch (error) {
+      console.error('Erro ao salvar as alterações:', error);
+      alert('Erro ao salvar as alterações');
+    }
   };
-
+ 
   return (
-    <div style={{
-      maxWidth: '400px', // Card mais compacto
+<div style={{
+      maxWidth: '400px',
       margin: '0 auto',
       padding: '1.5rem',
       backgroundColor: '#ffffff',
@@ -49,20 +59,20 @@ const UserPage = () => {
       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
       textAlign: 'left',
     }}>
-      <h2 style={{
+<h2 style={{
         textAlign: 'center',
         color: '#333',
         marginBottom: '1rem',
         fontSize: '1.5rem',
       }}>
         Perfil do Usuário
-      </h2>
-
+</h2>
+ 
       {editMode ? (
-        <>
-          <div style={{ marginBottom: '1rem' }}>
-            <label>Nome:</label>
-            <input
+<>
+<div style={{ marginBottom: '1rem' }}>
+<label>Nome:</label>
+<input
               type="text"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
@@ -74,11 +84,11 @@ const UserPage = () => {
                 border: '1px solid #ccc',
               }}
             />
-          </div>
-
+</div>
+ 
           <div style={{ marginBottom: '1rem' }}>
-            <label>Nova Senha:</label>
-            <input
+<label>Nova Senha:</label>
+<input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -90,8 +100,8 @@ const UserPage = () => {
                 border: '1px solid #ccc',
               }}
             />
-          </div>
-
+</div>
+ 
           <button
             onClick={handleSave}
             style={{
@@ -104,10 +114,10 @@ const UserPage = () => {
               cursor: 'pointer',
               marginBottom: '0.5rem',
             }}
-          >
+>
             Salvar Alterações
-          </button>
-          <button
+</button>
+<button
             onClick={() => setEditMode(false)}
             style={{
               width: '100%',
@@ -118,15 +128,15 @@ const UserPage = () => {
               borderRadius: '5px',
               cursor: 'pointer',
             }}
-          >
+>
             Cancelar
-          </button>
-        </>
+</button>
+</>
       ) : (
-        <>
-          <UserInfoCard label="Nome" value={userData.name} />
-          <UserInfoCard label="Senha" value={userData.password} />
-          <button
+<>
+<UserInfoCard label="Nome" value={userData.name} />
+<UserInfoCard label="Senha" value={userData.password} />
+<button
             onClick={() => setEditMode(true)}
             style={{
               width: '100%',
@@ -138,13 +148,13 @@ const UserPage = () => {
               cursor: 'pointer',
               marginTop: '1rem',
             }}
-          >
+>
             Editar Perfil
-          </button>
-        </>
+</button>
+</>
       )}
-    </div>
+</div>
   );
 };
-
+ 
 export default UserPage;

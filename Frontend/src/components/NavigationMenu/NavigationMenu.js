@@ -25,8 +25,10 @@ const NavigationMenu = ({ onLogout }) => {
 <li><Link to="/user"><FaUser className={styles.icon} /></Link></li>
 <li>
 <button onClick={handleLogoutClick} className={styles.logoutButton}>
-<FaSignOutAlt className={styles.icon} /> Sair
-</button>
+            <div className={styles.iconCenter}>
+              <FaSignOutAlt className={styles.icon} />
+            </div>
+          </button>
 </li>
 </ul>
 </nav>
